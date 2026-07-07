@@ -1,0 +1,163 @@
+Actor PlayerCheckerToken : Inventory {inventory.maxamount 1 +INVENTORY.UNDROPPABLE +UNDROPPABLE}
+
+// Glory Kill Pinata Controller, gives health correct ammount needed to player
+// Boss-Type Pinata, not affected by this
+Actor GKPlayer_LowHealth : PlayerCheckerToken {}
+Actor GKPlayer_RegularHealth : PlayerCheckerToken {}
+Actor GKPlayer_GoodHealth : PlayerCheckerToken {}
+
+// Chainsaw Kill Ammo Checkers
+Actor CKPlayer_HasBullets : PlayerCheckerToken {}
+Actor CKPlayer_HasShells : PlayerCheckerToken {}
+Actor CKPlayer_HasRockets : PlayerCheckerToken {}
+Actor CKPlayer_HasCells : PlayerCheckerToken {}
+Actor CKPlayer_HasSlugs : PlayerCheckerToken {}
+
+// Low Ammo Reserves
+Actor CKPlayer_LowBullets : PlayerCheckerToken {}
+Actor CKPlayer_LowShells  : PlayerCheckerToken {}
+Actor CKPlayer_LowRockets : PlayerCheckerToken {}
+Actor CKPlayer_LowCells : PlayerCheckerToken {}
+Actor CKPlayer_LowSlugs : PlayerCheckerToken {}
+
+// Regular Ammo Reserves
+Actor CKPlayer_RegularBullets : PlayerCheckerToken {}
+Actor CKPlayer_RegularShells : PlayerCheckerToken {}
+Actor CKPlayer_RegularRockets : PlayerCheckerToken {}
+Actor CKPlayer_RegularCells : PlayerCheckerToken {}
+Actor CKPlayer_RegularSlugs : PlayerCheckerToken {}
+
+// Good ammo Reserves
+Actor CKPlayer_GoodBullets : PlayerCheckerToken {}
+Actor CKPlayer_GoodShells : PlayerCheckerToken {}
+Actor CKPlayer_GoodRockets : PlayerCheckerToken {}
+Actor CKPlayer_GoodCells : PlayerCheckerToken {}
+Actor CKPlayer_GoodSlugs : PlayerCheckerToken {}
+
+// Game-mode Checker
+ACTOR PlayerStartChecker : Weapon
+{
+	States
+	{
+	Select:
+		TNT1 A 0
+		TNT1 A 0 A_Raise
+		Wait
+	Deselect:
+		TNT1 A 0
+		TNT1 A 0 A_Lower
+		Wait
+	Fire:
+		TNT1 A 0
+		Goto Ready
+	Ready:
+		TNT1 A 1
+		TNT1 A 0 A_GiveInventory("IsPlayingD4Arsenal",1) // New Handler for Custom HUDs
+		// Ammo Starts
+		TNT1 A 0 A_GiveInventory("D4MP40Ammo",32)
+		TNT1 A 0 A_GiveInventory("D4MP40AmmoDual",64)
+		// Check Gamemodes
+		TNT1 A 0 ACS_NamedExecuteAlways("D4GameModeHandler") // Starts The Handler
+		//TNT1 A 0 ACS_NamedExecuteAlways("PlayerHealthDetection") // This script is for Health Pinata Controller
+		TNT1 A 1
+		TNT1 A 0 A_GiveInventory("D4Pistol",1)
+		TNT1 A 0 A_SelectWeapon("D4Pistol")
+		TNT1 A 1
+		TNT1 A 0 A_TakeInventory("PlayerStartChecker",1)
+		Goto Ready
+	}
+}
+
+Actor CoopHandler : CustomInventory
+{
+	States
+	{
+	Pickup:
+		TNT1 A 0 A_JumpIfInventory("IsPlayingAsCoop",1,"Procced")
+		TNT1 A 0 A_GiveInventory("IsPlayingAsCoop",1)
+	Procced:
+		TNT1 A 1 A_TakeInventory("JustStartedGame",1)
+		Stop
+	}
+}
+
+ACTOR DeathMatchHandler : CustomInventory
+{
+	States
+	{
+	Pickup:
+		TNT1 A 0 A_JumpIfInventory("IsPlayingAsDM",1,"Taker")
+		TNT1 A 0 ACS_NamedTerminate("PlayerHealthDetection")
+		TNT1 A 0 A_GiveInventory("GKPlayer_GoodHealth",1)
+		TNT1 A 0 A_GiveInventory("GKPlayer_RegularHealth",1)
+		TNT1 A 0 A_GiveInventory("GKPlayer_LowHealth",1)
+		TNT1 A 0 A_GiveInventory("IsPlayingAsDM",1)
+		// Gives all Death match Weapon Alt-Fires
+		TNT1 A 0 A_GiveInventory("RandomEquipmentStart",1)
+		TNT1 A 0 A_GiveInventory("GrenadeAmmo",5)
+		TNT1 A 0 A_GiveInventory("ModTriShotActive",1)
+		TNT1 A 0 A_GiveInventory("ModMicroMissileActive",1)
+		TNT1 A 0 A_GiveInventory("ModGatlingRotatorActive",1)
+		TNT1 A 0 A_GiveInventory("ModLockOnActive",1)
+		TNT1 A 0 A_GiveInventory("ModStunBombActive",1)
+		TNT1 A 0 A_GiveInventory("ModPrecisionScopeActive",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradeLightningGunAltFire",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradeLightningGunDamage",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradeGrenadeLaucherAltFire",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradePistolProtoGenerator",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradeRepeaterDamage",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradeHellshotAltFire",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradeVortexRifleDamage",1)
+		TNT1 A 0 A_GiveInventory("HasUpgradeSuperShotgunDoubleTrouble",1)
+		TNT1 A 0 ACS_NamedExecuteAlways("PlayerGloryKillable") // Player Glory Killable Script
+		Goto Taker
+		
+	Taker:
+		// Takes All Out Upgrader and Mod Swaping Tokens
+		TNT1 A 0 A_TakeInventory("StartUpgrader",1)
+		TNT1 A 0 A_TakeInventory("UpgraderActive",1)
+		TNT1 A 0 A_TakeInventory("IsUpgradeableWeapon",1)
+		// Removes all Swaping Mod Tokens
+		TNT1 A 0 A_TakeInventory("ModHasTriShot",1)
+		TNT1 A 0 A_TakeInventory("ModHasExplosiveShot",1)
+		TNT1 A 0 A_TakeInventory("ModHasMicroMissile",1)
+		TNT1 A 0 A_TakeInventory("ModHasTacticalScope",1)
+		TNT1 A 0 A_TakeInventory("ModHasGatlingRotator",1)
+		TNT1 A 0 A_TakeInventory("ModHasMobileTurret",1)
+		TNT1 A 0 A_TakeInventory("ModHasDetonator",1)
+		TNT1 A 0 A_TakeInventory("ModHasLockOn",1)
+		TNT1 A 0 A_TakeInventory("ModHasStunBomb",1)
+		TNT1 A 0 A_TakeInventory("ModHasHeatWave",1)
+		TNT1 A 0 A_TakeInventory("ModHasPrecisionScope",1)
+		TNT1 A 0 A_TakeInventory("ModHasSiegeMode",1)
+		// Removes all activer tokens
+		TNT1 A 0 A_TakeInventory("ModExplosiveShotActive",1)
+		TNT1 A 0 A_TakeInventory("ModTacticalScopeActive",1)
+		TNT1 A 0 A_TakeInventory("ModMobileTurretActive",1)
+		TNT1 A 0 A_TakeInventory("ModDetonatorActive",1)
+		TNT1 A 0 A_TakeInventory("ModHeatWaveActive",1)
+		TNT1 A 0 A_TakeInventory("ModSiegeModeActive",1)
+		// Checks for Upgrade Token
+		TNT1 A 0 A_JumpIfInventory("UpgradeBoxToken",1,"BackPackGiver")
+		Goto TicFramme
+		
+	BackPackGiver:
+		TNT1 A 0 A_TakeInventory("UpgradeBoxToken",32687)
+		TNT1 A 0 A_GiveInventory("D4Backpack",1)
+		Goto TicFramme
+		
+	TicFramme:
+		TNT1 A 1
+		Stop
+	}
+}
+
+ACTOR DoubleJumpSound : CustomInventory
+{
+	States
+	{
+	Pickup:
+		TNT1 A 0 A_PlaySound("Player/JumpSound",CHAN_AUTO,1.0,false,2.5)
+		Stop
+	}
+}
