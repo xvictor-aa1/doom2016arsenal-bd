@@ -1,0 +1,37 @@
+#library "startscripts"
+#include "zcommon.acs"
+
+Script "D4StartScripts" Enter
+{
+	ACS_NamedExecuteAlways("D4CheckCvars",0);
+	ACS_NamedExecuteAlways("CheckPlayerClass",0);
+	ACS_NamedExecuteAlways("WeaponRemover",0);
+	ACS_NamedExecuteAlways("StaticRifleACS",0);
+	ACS_NamedExecuteAlways("PlayerHealthDetection",0);
+	//ACS_NamedExecuteAlways("D4FlashLightFunc",0);
+	//ACS_NamedExecuteAlways("PlayerCheckUnderwater",0);
+	//ACS_NamedExecuteAlways("NewUseInput",0);
+}
+
+// Terminate all fucking new acs SCripts
+// They are already inlcuded in this mod and
+// ONLY works on BDv22 Vanilla.
+// This is only a temporary solution
+script "D4_FuckBD22" ENTER
+{
+	while(GetActorProperty(0, APROP_HEALTH) > 0)
+	{
+	//ACS_NamedTerminate("TE_UseInput", 0);
+	ACS_NamedTerminate("CheckSprint", 0);
+	ACS_Terminate(313, 0);
+	/*if(!stricmp(GetWeapon(), "LedgeGrab"))
+	{
+		GiveInventory("D4LedgeGrabFixer", 1);
+	}
+	else
+	{
+		TakeInventory("D4LedgeGrabFixer", 1);
+	}*/
+	Delay(4);
+	}
+}

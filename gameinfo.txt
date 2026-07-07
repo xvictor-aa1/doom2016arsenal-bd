@@ -1,0 +1,2 @@
+STARTUPTITLE = "Brutal DOOM v22 beta: DOOM 2016 Arsenal v1.2alpha"
+STARTUPCOLORS = "FF0000", "000000"
